@@ -8,8 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "@/components/toast/toast-style.css";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { EmotionCache } from "@emotion/cache";
 import { appWithTranslation } from "next-i18next";
 import { initializeParse } from "@parse/react-ssr";
@@ -44,7 +44,7 @@ const MyApp = (props: MyAppProps) => {
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <CacheProvider value={emotionCache}>
-          <LocalizationProvider dateAdapter={AdapterDateFns} locale={frLocale}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} localeText={frLocale}>
             <ThemeProvider theme={theme}>
               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
               <CssBaseline />

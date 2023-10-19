@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from "react";
 import { Avatar, Grid, useMediaQuery } from "@mui/material";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
-import { useForm, useField } from "react-final-form-hooks";
+import { Form, Field } from "react-final-form";
 
 import { useTranslation } from "next-i18next";
 import { emailFormat } from "@/utils/validators";
@@ -35,7 +35,8 @@ export const MyProfile = () => {
   const handleCloseWallet = () => setOpenWallet(false);
   const handleOpenReferral = () => setOpenReferral(true);
   const handleCloseReferral = () => setOpenReferral(false);
-  const handleCopyReferral = () => navigator.clipboard.writeText('https://rhapsody.io/364234');
+  const handleCopyReferral = () =>
+    navigator.clipboard.writeText("https://rhapsody.io/364234");
 
   const handleAvatarUpdated = () => {
     console.log("Avatar updated");
@@ -67,7 +68,7 @@ export const MyProfile = () => {
     try {
       setIsLoading(true);
       const registeredUser = await auth.updateProfile(values);
-      if(registeredUser) {
+      if (registeredUser) {
         Toast.success("Success", "Profile updated");
       }
     } catch (e: any) {
@@ -78,108 +79,131 @@ export const MyProfile = () => {
 
   const loggeduser = auth.getLoggedUser();
 
-  debugger
-
-  const { form, handleSubmit } = useForm({
-    onSubmit, // the function to call with your form values upon valid submit
-    validate,
-    initialValues: {
-      firstName: loggeduser.firstName,
-      lastName: loggeduser.lastName,
-      email:loggeduser.email
-    } // a record-level validation function to check all form values
-  });
-
-  const firstName = useField("firstName", form);
-  const lastName = useField("lastName", form);
-  const email = useField("email", form);
+  const initialValues = {
+    firstName: loggeduser.firstName,
+    lastName: loggeduser.lastName,
+    email: loggeduser.email,
+  }; // a record-level validation function to check all form values
 
   return (
     <Container disableGutters sx={{ marginBottom: 4, marginTop: 4 }}>
-      <Grid 
-        container spacing={3}
-        alignItems="center"
-      >
+      <Grid container spacing={3} alignItems="center">
         <Grid item xs={12} md={7}>
-          <Stack spacing={{md:6, xs: 3}} onSubmit={handleSubmit} component="form">
-            <Stack direction="row" justifyContent={{xs: "center"}}>
-              <Box display={{xs: "none", md: "block"}}>
-                <Typography fontSize={16} fontWeight="700" marginBottom="8px">
-                  {t("account.avatar")}
-                </Typography>
-                <Box
-                  component="span"
-                  color="#FFFFFFB0"
-                  fontSize={14}>
-                  {t("account.avatarDescription")}
-                  <Typography
-                    color="#3495FB"
-                    marginLeft="8px"
-                    fontSize={14}
-                    sx={{display: "inline-block", lineHeight: "180%", cursor: "pointer"}}
-                    onClick={handleOpenAvatar}>
-                    {t("common.change")}
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{position: "relative"}}>
-                <Avatar src={loggeduser.avatarImage?.url} sx={{width: {xs: 80, md: 64}, height: {xs: 80, md: 64}}}/>
-                <IconButton
-                  sx={{
-                    position: "absolute",
-                    right: "-4px",
-                    bottom: "-4px",
-                    backgroundColor: "#24282C",
-                    borderRadius: "50%",
-                  }}
-                  aria-label="avatar link"
-                  size="small"
-                  onClick={handleOpenAvatar}
-                >
-                  <CameraAltOutlinedIcon fontSize="inherit" sx={{color: "rgba(255,255,255,0.23)"}}/>
-                </IconButton>
-              </Box>
-            </Stack>
-            {[
-              {
-                label: t("form.labelFirstName"),
-                props: { ...firstName.input },
-                meta: { ...firstName.meta },
-              },
-              {
-                label: t("form.labelLastName"),
-                props: { ...lastName.input },
-                meta: { ...lastName.meta },
-              },
-              {
-                label: t("form.labelEmail"),
-                props: { ...email.input },
-                meta: { ...email.meta },
-              },
-            ].map((input) =>
-              <AppTextField
-                error={input.meta.submitFailed && input.meta.error}
-                variant="filled"
-                helperText={
-                  input.meta.submitFailed && input.meta.error && input.meta.error
-                }
-                key={input?.label}
-                label={input?.label}
-                type={"text"}
-                {...input.props}
-              />
+          <Form
+            onSubmit={onSubmit}
+            validate={validate}
+            initialValues={initialValues}
+            render={({ handleSubmit, submitting, pristine }) => (
+              <form onSubmit={handleSubmit}>
+                <Stack width="100%" spacing={{ md: 6, xs: 3 }}>
+                  <Stack direction="row" justifyContent={{ xs: "center" }}>
+                    <Box display={{ xs: "none", md: "block" }}>
+                      <Typography
+                        fontSize={16}
+                        fontWeight="700"
+                        marginBottom="8px"
+                      >
+                        {t("account.avatar")}
+                      </Typography>
+                      <Box component="span" color="#FFFFFFB0" fontSize={14}>
+                        {t("account.avatarDescription")}
+                        <Typography
+                          color="#3495FB"
+                          marginLeft="8px"
+                          fontSize={14}
+                          sx={{
+                            display: "inline-block",
+                            lineHeight: "180%",
+                            cursor: "pointer",
+                          }}
+                          onClick={handleOpenAvatar}
+                        >
+                          {t("common.change")}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ position: "relative" }}>
+                      <Avatar
+                        src={loggeduser.avatarImage?.url}
+                        sx={{
+                          width: { xs: 80, md: 64 },
+                          height: { xs: 80, md: 64 },
+                        }}
+                      />
+                      <IconButton
+                        sx={{
+                          position: "absolute",
+                          right: "-4px",
+                          bottom: "-4px",
+                          backgroundColor: "#24282C",
+                          borderRadius: "50%",
+                        }}
+                        aria-label="avatar link"
+                        size="small"
+                        onClick={handleOpenAvatar}
+                      >
+                        <CameraAltOutlinedIcon
+                          fontSize="inherit"
+                          sx={{ color: "rgba(255,255,255,0.23)" }}
+                        />
+                      </IconButton>
+                    </Box>
+                  </Stack>
+                  <Field name="firstName">
+                    {({ input, meta }) => (
+                      <AppTextField
+                        error={meta.submitFailed && meta.error}
+                        variant="filled"
+                        helperText={meta.submitFailed && meta.error}
+                        label={t("form.labelFirstName")}
+                        type="text"
+                        {...input}
+                      />
+                    )}
+                  </Field>
+                  <Field name="lastName">
+                    {({ input, meta }) => (
+                      <AppTextField
+                        error={meta.submitFailed && meta.error}
+                        variant="filled"
+                        helperText={meta.submitFailed && meta.error}
+                        label={t("form.labelLastName")}
+                        type="text"
+                        {...input}
+                      />
+                    )}
+                  </Field>
+                  <Field name="email">
+                    {({ input, meta }) => (
+                      <AppTextField
+                        error={meta.submitFailed && meta.error}
+                        variant="filled"
+                        helperText={meta.submitFailed && meta.error}
+                        label={t("form.labelEmail")}
+                        type="text"
+                        {...input}
+                      />
+                    )}
+                  </Field>
+                  <Box>
+                    <ButtonGradient
+                      fullWidth={mediumViewport && true}
+                      loading={isLoading}
+                      label={t("common.saveChanges")}
+                    />
+                  </Box>
+                </Stack>
+              </form>
             )}
-            <Box>
-              <ButtonGradient fullWidth={mediumViewport && true} loading={isLoading} label={t("common.saveChanges")} />
-            </Box>
-          </Stack>
+          />
         </Grid>
         <Grid item xs={12} md={5}>
           <Stack
-            marginLeft={{lg: "32px"}}
+            marginLeft={{ lg: "32px" }}
             justifyContent={"center"}
             height="100%"
-            spacing={3}>
+            spacing={3}
+          >
             <Stack
               sx={{
                 padding: "25px",
@@ -187,16 +211,24 @@ export const MyProfile = () => {
                 borderRadius: "8px",
               }}
             >
-              <Typography fontSize={{ xs: 14, sm: 18}} fontWeight="700">
+              <Typography fontSize={{ xs: 14, sm: 18 }} fontWeight="700">
                 {t("wallet.receivingWallet")}
               </Typography>
               <Box
                 marginTop="16px"
-                sx={{background: "#1A1C20", padding: "8px", paddingLeft: "12px", borderRadius: "2px"}}>
+                sx={{
+                  background: "#1A1C20",
+                  padding: "8px",
+                  paddingLeft: "12px",
+                  borderRadius: "2px",
+                }}
+              >
                 <Typography
-                  fontSize={{ xs: 14, sm: 16}}
-                  color={theme.palette.content.secondary}>
-                  {loggeduser.currentWalletInfo?.address && truncate(loggeduser.currentWalletInfo?.address)}
+                  fontSize={{ xs: 14, sm: 16 }}
+                  color={theme.palette.content.secondary}
+                >
+                  {loggeduser.currentWalletInfo?.address &&
+                    truncate(loggeduser.currentWalletInfo?.address)}
                 </Typography>
               </Box>
               <Typography
@@ -204,7 +236,8 @@ export const MyProfile = () => {
                 marginTop="32px"
                 fontWeight="900"
                 onClick={handleOpenWallet}
-                sx={{cursor: "pointer", textTransform: "uppercase"}}>
+                sx={{ cursor: "pointer", textTransform: "uppercase" }}
+              >
                 {t("wallet.editWallet")}
               </Typography>
             </Stack>
@@ -221,14 +254,14 @@ export const MyProfile = () => {
                 justifyContent="space-between"
                 width="100%"
               >
-                <Typography fontSize={{ xs: 14, sm: 18}} fontWeight="700">
+                <Typography fontSize={{ xs: 14, sm: 18 }} fontWeight="700">
                   {t("referral.earnWithReferral")}
                 </Typography>
                 <Typography
                   color="#42A4FF"
-                  fontSize={{ xs: 14, sm: 16}}
+                  fontSize={{ xs: 14, sm: 16 }}
                   onClick={handleOpenReferral}
-                  sx={{cursor: "pointer"}}
+                  sx={{ cursor: "pointer" }}
                 >
                   {t("common.more")}
                 </Typography>
@@ -236,15 +269,23 @@ export const MyProfile = () => {
               <Typography
                 marginTop="16px"
                 color="rgba(255, 255, 255, 0.4)"
-                fontSize={{ xs: 14, sm: 16}}>
+                fontSize={{ xs: 14, sm: 16 }}
+              >
                 {t("referral.earnWithReferralDescription")}
               </Typography>
               <Box
                 marginTop="16px"
-                sx={{background: "#1A1C20", padding: "8px", paddingLeft: "12px", borderRadius: "2px"}}>
+                sx={{
+                  background: "#1A1C20",
+                  padding: "8px",
+                  paddingLeft: "12px",
+                  borderRadius: "2px",
+                }}
+              >
                 <Typography
-                  fontSize={{ xs: 14, sm: 16}}
-                  color={theme.palette.content.secondary}>
+                  fontSize={{ xs: 14, sm: 16 }}
+                  color={theme.palette.content.secondary}
+                >
                   https://rhapsody.io/364234
                 </Typography>
               </Box>
@@ -253,18 +294,22 @@ export const MyProfile = () => {
                 marginTop="32px"
                 fontWeight="900"
                 onClick={handleCopyReferral}
-                sx={{cursor: "pointer", textTransform: "uppercase"}}>
+                sx={{ cursor: "pointer", textTransform: "uppercase" }}
+              >
                 {t("referral.copyReferral")}
               </Typography>
             </Stack>
           </Stack>
         </Grid>
       </Grid>
-      <AvatarModal 
-        imgSrc={loggeduser.avatarImage?.url || "/images/avatar-user-default.svg"}
+      <AvatarModal
+        imgSrc={
+          loggeduser.avatarImage?.url || "/images/avatar-user-default.svg"
+        }
         open={openAvatar}
         onClose={handleCloseAvatar}
-        onAvatarUpdated={handleAvatarUpdated} />
+        onAvatarUpdated={handleAvatarUpdated}
+      />
       <WalletAddressModal open={openWallet} onClose={handleCloseWallet} />
       <ReferralModal open={openReferral} onClose={handleCloseReferral} />
     </Container>
