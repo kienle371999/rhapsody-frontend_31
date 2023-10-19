@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { useForm, useField } from "react-final-form-hooks";
+import { Form, Field } from "react-final-form";
 
 import { AppTextField } from "@/components/inputs/text";
 import { ButtonPrimary } from "@/components/buttons/styles";
@@ -13,7 +13,7 @@ import { MUILink } from "@/components/mui-link";
 import { Toast } from "@/components/toast";
 import { ROUTES } from "@/config/navigation";
 import { useAuth } from "@/contexts/auth";
-import {emailFormat} from "@/utils/validators"
+import { emailFormat } from "@/utils/validators";
 
 export const SignInForm = () => {
   const router = useRouter();
@@ -45,80 +45,73 @@ export const SignInForm = () => {
         });
         setIsLoading(false);
       }
-    } catch (e:any) {
-      setIsLoading(false)
+    } catch (e: any) {
+      setIsLoading(false);
       Toast.error(`Try again!`, e.message);
     }
   };
 
-  const { form, handleSubmit } = useForm({
-    onSubmit, // the function to call with your form values upon valid submit
-    validate, // a record-level validation function to check all form values
-  });
-
-  const email = useField("email", form);
-  const password = useField("password", form);
-
   return (
     <Stack width="100%" spacing={{ xs: 3, md: 2 }}>
       <Typography variant="title1">{t("signIn.logIn")}</Typography>
-      <Stack
-        onSubmit={handleSubmit}
-        component="form"
-        spacing={{ xs: 3, md: 2 }}
-      >
-        {[
-          {
-            label: t("form.labelEmail"),
-            props: { ...email.input },
-            meta: { ...email.meta },
-          },
-          {
-            label: t("form.labelPassword"),
-            type: "password",
-            props: { ...password.input },
-            meta: password.meta,
-          },
-        ].map((input) => (
-          <Box key={input?.label}>
-            <AppTextField
-              fullWidth
-              error={input.meta.submitFailed && input.meta.error}
-              variant="filled"
-              helperText={
-                input.meta.submitFailed && input.meta.error && input.meta.error
-              }
-              label={input?.type == "date" ? "" : input?.label}
-              type={input?.type ?? "text"}
-              {...input.props}
-            />
-            <MUILink
-              href={{
-                pathname: ROUTES.forgotPassword,
-              }}
-            >
-             {input.type === "password" && <Button
-                variant="text"
-                sx={{
-                  textTransform: "capitalize",
+      <Form
+        onSubmit={onSubmit}
+        validate={validate}
+        render={({ handleSubmit, submitting, pristine }) => (
+          <form onSubmit={handleSubmit}>
+            <Stack width="100%" spacing={{ md: 3, xs: 2 }}>
+              <Field name="email">
+                {({ input, meta }) => (
+                  <AppTextField
+                    error={meta.submitFailed && meta.error}
+                    variant="filled"
+                    helperText={meta.submitFailed && meta.error}
+                    label={t("form.labelEmail")}
+                    type="text"
+                    {...input}
+                  />
+                )}
+              </Field>
+              <Field name="password">
+                {({ input, meta }) => (
+                  <AppTextField
+                    error={meta.submitFailed && meta.error}
+                    variant="filled"
+                    helperText={meta.submitFailed && meta.error}
+                    label={t("form.labelPassword")}
+                    type="password"
+                    {...input}
+                  />
+                )}
+              </Field>
+              <MUILink
+                href={{
+                  pathname: ROUTES.forgotPassword,
                 }}
               >
-                {"Forgot your password?"}
-              </Button>}
-            </MUILink>
-          </Box>
-        ))}
-        <ButtonPrimary
-          loading={isLoading}
-          type="submit"
-          size="large"
-          sx={{
-            fontSize: { xs: 18 },
-          }}
-        >
-          {t("signIn.continue")}
-        </ButtonPrimary>
-      </Stack>
+                <Button
+                  variant="text"
+                  sx={{
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {"Forgot your password?"}
+                </Button>
+              </MUILink>
+              <ButtonPrimary
+                loading={isLoading}
+                type="submit"
+                size="large"
+                sx={{
+                  fontSize: { xs: 18 },
+                }}
+              >
+                {t("signIn.continue")}
+              </ButtonPrimary>
+            </Stack>
+          </form>
+        )}
+      />
     </Stack>
   );
 };
